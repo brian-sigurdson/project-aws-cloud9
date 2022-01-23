@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: A template to provision an AWS Cloud9 IDE on demand.
+
+Parameters:
+  EC2InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+
+########################################################################################################################
+Resources:
+  Cloud9Environment:
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties:
+      Description: A dynamically created Cloud9 IDE based on user paramter specifications.
+      # see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloud9-environmentec2.html
+      # for limitations.
+      # get from the instance and let the instance get it from a parameter?
+      ImageId: amazonlinux-2-x86_64
+      # get from the instance?
+      InstanceType: !Ref EC2InstanceType
+      # see https://github.com/aws-samples/aws-cloud9-bootstrapping-example/blob/main/example_instancestack.yaml
+      # for an example of how to handle this for 3rd parties.
+#      OwnerArn: "parameter"
+      # nothing for this just yet
+#      Repositories: "?"
+      #"from-vpn? or instance?"
+      SubnetId: subnet-004fa2f34afb3d717
+      Tags:
+        - Key: Cloud9-Name
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9'
+
+# most of the values for the instance should come from the parameters
+  Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-0ebce55c704edb088
+      InstanceType: t2.micro
+      # I should create another env and decode their user data to see what they had
+#      UserData: >-
+#        (removed.  obsfucates)
+#      Tags:
+#        - Key: Name
+#          Value: aws-cloud9-basic-env-95ee1794b3d14224ab40ab4de8ec5db6
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: subnet-004fa2f34afb3d717
+          GroupSet:
+            - !Ref InstanceSecurityGroup
+  InstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: >-
+        Security group for AWS Cloud9 environment
+        aws-cloud9-basic-env-95ee1794b3d14224ab40ab4de8ec5db6
+      # public vpc, so i'll want to allow a way to create a new vpc?
+      VpcId: vpc-04316aea239fff926
+      SecurityGroupIngress:
+        - FromPort: 22
+          ToPort: 22
+          IpProtocol: tcp
+          # I'm not sure if this is the way to do it, just trying to make it work for a moment.
+          # I should try to figure out
+          CidrIp: 98.30.107.147/32
+#          CidrIp: 18.188.9.32/27
+        - FromPort: 22
+          ToPort: 22
+          IpProtocol: tcp
+          CidrIp: 98.30.107.147/32
+#          CidrIp: 18.188.9.0/27
+#      Tags:
+#        - Key: Name
+#          Value: aws-cloud9-basic-env-95ee1794b3d14224ab40ab4de8ec5db6
+
+########################################################################################################################
+
