@@ -17,6 +17,16 @@ Parameters:
       - amazonlinux-2-x86_64
       - ubuntu-18.04-x86_64
 
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-08e4e35cccc6189f4
+    us-east-2:
+      AMI: ami-001089eb624938d9f
+
+#Conditions:
+
+
 ########################################################################################################################
 Resources:
   # c9 env
@@ -32,6 +42,7 @@ Resources:
 #      OwnerArn: "parameter"
 
       #"from-vpn? or instance? or parameter"
+      # I think that there is a way to have the paramter list all avail subnets and the user selects
       SubnetId: subnet-004fa2f34afb3d717
       Tags:
         - Key: Cloud9-Name
@@ -41,7 +52,7 @@ Resources:
   Instance:
     Type: 'AWS::EC2::Instance'
     Properties:
-      ImageId: ami-0ebce55c704edb088 # get from a map
+      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
       InstanceType: !Ref EC2InstanceType
       # I should create another env and decode their user data to see what they had
 #      UserData: >-
@@ -61,7 +72,8 @@ Resources:
       GroupDescription: >-
         Security group for AWS Cloud9 environment
         aws-cloud9-basic-env-95ee1794b3d14224ab40ab4de8ec5db6
-      # public vpc, so i'll want to allow a way to create a new vpc?
+      # The use should be allowed to choose from a list?
+      # or should I just default to the default vpc?
       VpcId: vpc-04316aea239fff926
       SecurityGroupIngress:
         - FromPort: 22
