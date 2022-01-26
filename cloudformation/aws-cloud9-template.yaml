@@ -2,13 +2,21 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: A template to provision an AWS Cloud9 IDE on demand.
 
 Parameters:
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
   EC2InstanceType:
     Description: EC2 instance type
     Type: String
     Default: t2.micro
     AllowedValues:
       - t2.micro
+      - t3.small
+      - m5.large
+    ConstraintDescription:  'Instance type must be one of the following:  t2.micro, t3.small, m5.large.'
   EC2ImageId:
+    # see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloud9-environmentec2.html for limitations.
     Description: EC2 ImageId
     Type: String
     Default: amazonlinux-2-x86_64
@@ -16,6 +24,14 @@ Parameters:
       - amazonlinux-1-x86_64
       - amazonlinux-2-x86_64
       - ubuntu-18.04-x86_64
+    ConstraintDescription:
+      'EC2 image id must be one of the following:  amazonlinux-1-x86_64, amazonlinux-2-x86_64, ubuntu-18.04-x86_64.'
+  AutomaticStopTime:
+    Description:  The number of minutes until the running instance is shut down after the environment was last used.
+    Type: Number
+    MinValue: 1
+    MaxValue: 20160
+    Default: 30
 
 Mappings:
   RegionMap:
@@ -24,57 +40,43 @@ Mappings:
     us-east-2:
       AMI: ami-001089eb624938d9f
 
-#Conditions:
-
-
 ########################################################################################################################
 Resources:
-  # c9 env
   Cloud9Environment:
     Type: AWS::Cloud9::EnvironmentEC2
     Properties:
+      AutomaticStopTimeMinutes: !Ref AutomaticStopTime
       Description: A dynamically created Cloud9 IDE based on user specifications.
-      # see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloud9-environmentec2.html for limitations.
       ImageId: !Ref EC2ImageId
       InstanceType: !Ref EC2InstanceType
-      # see https://github.com/aws-samples/aws-cloud9-bootstrapping-example/blob/main/example_instancestack.yaml
-      # for an example of how to handle this for 3rd parties.
-#      OwnerArn: "parameter"
-
-      #"from-vpn? or instance? or parameter"
-      # I think that there is a way to have the paramter list all avail subnets and the user selects
-      SubnetId: subnet-004fa2f34afb3d717
+      SubnetId: !Ref SubnetId
       Tags:
-        - Key: Cloud9-Name
-          Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9'
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9-Env'
 
-# most of the values for the instance should come from the parameters
   Instance:
-    Type: 'AWS::EC2::Instance'
+    Type: AWS::EC2::Instance
     Properties:
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
       InstanceType: !Ref EC2InstanceType
-      # I should create another env and decode their user data to see what they had
-#      UserData: >-
-#        (removed.  obsfucates)
-#      Tags:
-#        - Key: Name
-#          Value: aws-cloud9-basic-env-95ee1794b3d14224ab40ab4de8ec5db6
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9-EC2'
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
           DeviceIndex: 0
-          SubnetId: subnet-004fa2f34afb3d717
+          SubnetId: !Ref SubnetId
           GroupSet:
             - !Ref InstanceSecurityGroup
   InstanceSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: >-
-        Security group for AWS Cloud9 environment
-        aws-cloud9-basic-env-95ee1794b3d14224ab40ab4de8ec5db6
-      # The use should be allowed to choose from a list?
-      # or should I just default to the default vpc?
-      VpcId: vpc-04316aea239fff926
+      GroupDescription: Security group for AWS Cloud9 environment
+      VpcId: !Ref VPCId
       SecurityGroupIngress:
         - FromPort: 22
           ToPort: 22
@@ -85,9 +87,10 @@ Resources:
           CidrIp: 98.30.107.147/32
           # leaving it open for now, since i'm not leaving it up for long.
 #          CidrIp: 0.0.0.0/0
-#      Tags:
-#        - Key: Name
-#          Value: aws-cloud9-basic-env-95ee1794b3d14224ab40ab4de8ec5db6
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9-EC2-SG'
 
 ########################################################################################################################
+#Outputs:
 
