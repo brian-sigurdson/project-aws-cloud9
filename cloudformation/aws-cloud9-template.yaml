@@ -51,7 +51,7 @@ Resources:
       InstanceType: !Ref EC2InstanceType
       SubnetId: !Ref SubnetId
       Tags:
-        - Key: Name
+        - Key: name # cf fails when using Name or "Name" or 'Name'
           Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9-Env'
 
   Instance:
@@ -64,7 +64,7 @@ Resources:
           #!/bin/bash
           yum update -y
       Tags:
-        - Key: Name
+        - Key: name
           Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9-EC2'
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
@@ -88,9 +88,11 @@ Resources:
           # leaving it open for now, since i'm not leaving it up for long.
 #          CidrIp: 0.0.0.0/0
       Tags:
-        - Key: Name
+        -
+          Key: name
           Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9-EC2-SG'
 
 ########################################################################################################################
-#Outputs:
-
+Outputs:
+  Cloud9WebLink:
+    Value: !Join ['', ['https://', !Ref AWS::Region, '.console.aws.amazon.com/cloud9/ide/', !Ref Cloud9Environment]]
