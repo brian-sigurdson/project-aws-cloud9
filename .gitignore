@@ -1,5 +1,6 @@
 # terrform files
 .terraform*
+terraform.tfstate*
 
 # anything related to mac
 __MACOSX
