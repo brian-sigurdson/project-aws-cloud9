@@ -3,7 +3,6 @@ A personal development project to automate the provisioning of an AWS Cloud9 IDE
 * [CloudFormation](cloudformation/)
 * [Terraform](terraform/)
 * [Python](python/)
-* Bash
-* Go
+* Go (not started)
 
 The repository is for personal use and professional development.
