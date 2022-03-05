@@ -1,2 +1,6 @@
 # project-cloud9
-A placeholder for the README.md for the Terraform implementation of the Cloud9 project. 
+This is the Terrform implementation of this AWS Cloud9 IDE project.
+
+Prerequisites:
+1. An AWS account with administrative privileges.
+2. A local installation of Terraform.

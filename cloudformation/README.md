@@ -1,2 +1,5 @@
 # project-cloud9
-A placeholder for the README.md for the CloudFormation implementation of the Cloud9 project. 
+This is the Cloudformation implementation of this AWS Cloud9 IDE project.
+
+Prerequisites:
+1. An AWS account with administrative privileges.
