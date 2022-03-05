@@ -4,9 +4,9 @@
 #####################################################################################################
 # providers
 #####################################################################################################
-# provider "aws" {
-#     region = "us-east-2"
-# }
+provider "aws" {
+    # region = "us-east-2"
+}
 
 #####################################################################################################
 # resources
@@ -35,5 +35,5 @@ data "aws_instance" "cloud9_instance" {
 # output
 #####################################################################################################
 # output "cloud9_url" {
-#   value = "https://${aws.region}.console.aws.amazon.com/cloud9/ide/${aws_cloud9_environment_ec2.example.id}"
+#   value = "https://${var.region}.console.aws.amazon.com/cloud9/ide/${aws_cloud9_environment_ec2.example.id}"
 # }
