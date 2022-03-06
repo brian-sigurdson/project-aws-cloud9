@@ -86,7 +86,7 @@ Resources:
           # my ip
           # CidrIp: 98.30.107.147/32
           # leaving it open for now, since i'm not leaving it up for long.
-         CidrIp: 0.0.0.0/0
+          CidrIp: 0.0.0.0/0
       Tags:
         -
           Key: name
