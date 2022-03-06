@@ -81,16 +81,12 @@ Resources:
   #       - FromPort: 22
   #         ToPort: 22
   #         IpProtocol: tcp
-  #         # I'm not sure if this is the way to do it, just trying to make it work for a moment.
-  #         # I should try to figure out
-  #         # my ip
-  #         # CidrIp: 98.30.107.147/32
   #         # leaving it open for now, since i'm not leaving it up for long.
   #         CidrIp: 0.0.0.0/0
-      Tags:
-        -
-          Key: name
-          Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9-EC2-SG'
+      # Tags:
+      #   -
+      #     Key: name
+      #     Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9-EC2-SG'
 
 ########################################################################################################################
 Outputs:
