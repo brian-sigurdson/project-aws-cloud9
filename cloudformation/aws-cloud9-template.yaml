@@ -70,23 +70,6 @@ Resources:
         - AssociatePublicIpAddress: true
           DeviceIndex: 0
           SubnetId: !Ref SubnetId
-  #         GroupSet:
-  #           - !Ref InstanceSecurityGroup
-  # InstanceSecurityGroup:
-  #   Type: AWS::EC2::SecurityGroup
-  #   Properties:
-  #     GroupDescription: Security group for AWS Cloud9 environment
-  #     VpcId: !Ref VPCId
-  #     SecurityGroupIngress:
-  #       - FromPort: 22
-  #         ToPort: 22
-  #         IpProtocol: tcp
-  #         # leaving it open for now, since i'm not leaving it up for long.
-  #         CidrIp: 0.0.0.0/0
-      # Tags:
-      #   -
-      #     Key: name
-      #     Value: !Sub '${AWS::StackName}-${AWS::Region}-Cloud9-EC2-SG'
 
 ########################################################################################################################
 Outputs:
