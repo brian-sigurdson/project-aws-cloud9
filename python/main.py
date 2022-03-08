@@ -33,16 +33,17 @@ if __name__ == '__main__':
 
     # create a resource service client using the default region
     ec2 = boto3.resource('ec2', region_name=client.meta.region_name)
+
+    print(f"The default region is: {client.meta.region_name}")
     
     for vpc in ec2.vpcs.all():
         the_vpc = ec2.Vpc(vpc.id)
-        print(vpc.id)
-        print(f"Is default? {the_vpc.is_default}")
-        # print(f"cidr: {the_vpc.cidr_block}")
-        # print(the_vpc.dhcp_options)
-        for subnet in the_vpc.subnets.all():
-            the_subnet = ec2.Subnet(subnet.id)
-            print(the_subnet)
+
+        if the_vpc.is_default:
+            print(f"The default VPC is: {vpc.id}")
+            for subnet in the_vpc.subnets.all():
+                the_subnet = ec2.Subnet(subnet.id)
+                print(the_subnet)
 
 
 
