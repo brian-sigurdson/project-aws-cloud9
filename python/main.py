@@ -35,8 +35,14 @@ if __name__ == '__main__':
     ec2 = boto3.resource('ec2', region_name=client.meta.region_name)
     
     for vpc in ec2.vpcs.all():
+        the_vpc = ec2.Vpc(vpc.id)
         print(vpc.id)
-        print(f"Is default? {ec2.Vpc(vpc.id).is_default}")
+        print(f"Is default? {the_vpc.is_default}")
+        # print(f"cidr: {the_vpc.cidr_block}")
+        # print(the_vpc.dhcp_options)
+        for subnet in the_vpc.subnets.all():
+            the_subnet = ec2.Subnet(subnet.id)
+            print(the_subnet)
 
 
 
