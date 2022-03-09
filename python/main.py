@@ -20,7 +20,7 @@ def create_cloud9(subnet_id):
             },
         ],
         # connectionType='CONNECT_SSM'#,
-        dryRun=True,
+        # dryRun=True,
     )
 
     return response
@@ -41,12 +41,15 @@ if __name__ == '__main__':
     for vpc in ec2.vpcs.all():
         the_vpc = ec2.Vpc(vpc.id)
 
+        # ** all of this will have to change now, based on cli parameters **
         if the_vpc.is_default:
             default_vpc_exists = True
             print(f"The default region is: {client.meta.region_name}")
             print(f"The default VPC is: {vpc.id}")
-            # use the first subnet
-            the_subnet = list(the_vpc.subnets.all())[0]
+
+            # you can't just use the first subnet, you need to make sure that the subnet is public too.
+            for subnet in the_vpc.subnets.all():
+                if subnet
             print(f"The availability zone is: {the_subnet.availability_zone}")
             print(f"Cloud9 will be deployed to subnet: {the_subnet.id}")
             response = create_cloud9(the_subnet.id)
